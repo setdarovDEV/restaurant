@@ -1,5 +1,6 @@
 .env
-temp_qr_codes
-alembic
-alembic.ini
 venv
+alembic.ini
+alembic
+.idea
+temp_qr_codes
