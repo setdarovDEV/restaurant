@@ -26,7 +26,6 @@ mdurl==0.1.2
 packaging==24.2
 passlib==1.7.4
 pillow==11.0.0
-psycopg2==2.9.10
 psycopg2-binary==2.9.10
 pydantic==1.10.11
 pydantic_core==2.23.4

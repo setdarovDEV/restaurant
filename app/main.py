@@ -1,8 +1,18 @@
 import requests
+import io
+import logging
+import re
+
 from datetime import timedelta
+from fastapi.responses import FileResponse, StreamingResponse
+import easyocr
 from fastapi import FastAPI
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
+import PIL
+from PIL import Image, ImageOps
+import numpy
+
 from app.routers.auth import auth_router
 from app.routers.orders import order_router
 from app.routers.menu import menu_router
@@ -13,6 +23,10 @@ from app.routers.reservation import reservation_router
 
 
 app = FastAPI()
+ocr = easyocr.Reader(["en"])
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("ocr")
+
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(order_router, prefix="/orders", tags=["Orders"])
 app.include_router(menu_router, prefix="/menu", tags=["Menu"])
@@ -36,4 +50,3 @@ def get_config():
 @app.get("/")
 async def root():
     return {"message": "Welcome to restaurant project"}
-

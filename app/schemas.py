@@ -16,9 +16,12 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
+    username: str
     first_name: str
     last_name: str
+    phone_number: str
     password: str
+    role: Optional[RoleEnum] = RoleEnum.USER
 
 
 class UserLogin(BaseModel):

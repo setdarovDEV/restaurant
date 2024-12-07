@@ -1,4 +1,5 @@
 import enum
+from email.policy import default
 
 from pydantic import validator
 from sqlalchemy import Enum as SqlEnum, Float
@@ -32,7 +33,7 @@ class User(Base):
     last_name = Column(String)
     phone_number = Column(String)
     hashed_password = Column(String)
-    role = Column(SqlEnum(RoleEnum), index=True)  # Enum uchun SqlEnum
+    role = Column(SqlEnum(RoleEnum), nullable=True, index=True, default=RoleEnum.USER)  # Enum uchun SqlEnum
 
     orders = relationship('Order', back_populates='user')
     reservations = relationship('Reservation', back_populates='user')
