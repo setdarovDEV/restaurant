@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from app.routers.auth import auth_router
 from app.routers.orders import order_router
 from app.routers.menu import menu_router
-from app.routers.payment import payment_router
+from app.routers.payme import payme_router
 from app.routers.statistics import statistics_router
 from app.routers.table import table_router
 from app.routers.reservation import reservation_router
@@ -21,7 +21,7 @@ app.include_router(menu_router, prefix="/menu", tags=["Menu"])
 app.include_router(table_router, prefix="/table", tags=["Table"])
 app.include_router(reservation_router, prefix="/reservation", tags=["Reservation"])
 app.include_router(statistics_router, prefix="/statistics", tags=["Statistics"])
-app.include_router(payment_router, prefix="/payment", tags=["Payment"])
+app.include_router(payme_router, prefix="/payme", tags=["Payme"])
 
 
 class Settings(BaseModel):
