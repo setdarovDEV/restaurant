@@ -1,5 +1,4 @@
 import os
-
 from fastapi import APIRouter, HTTPException
 from app.services.payme import PaymeClient
 
@@ -7,8 +6,7 @@ payme_router = APIRouter()
 payme_client = PaymeClient(
     os.getenv('PAYME_MERCHANT_ID'),
     os.getenv('PAYME_MERCHANT_KEY'),
-    os.getenv('PAYME_TEST_MODE'),
-
+    test_mode=os.getenv('PAYME_TEST_MODE') == 'True',
 )
 
 @payme_router.post("/payme/create-invoice/")
@@ -32,11 +30,15 @@ async def check_status(transaction_id: str):
 
 @payme_router.post("/webhook")
 async def webhook(data: dict):
-    if data["method"] == "PerformTransaction":
-        order_id = data["params"]["account"]["order_id"]
-        transaction_id = data["params"]["id"]
-        return {"result": {"perform_time": 123456789, "state": 1}}
-    elif data["method"] == "CancelTransaction":
-        return {"result": {"cancel_time": 123456789, "state": -1}}
-    else:
-        raise HTTPException(status_code=400, detail="Unknown method")
+    try:
+        if data["method"] == "PerformTransaction":
+            order_id = data["params"]["account"]["order_id"]
+            transaction_id = data["params"]["id"]
+            # Perform additional actions like updating the order status
+            return {"result": {"perform_time": 123456789, "state": 1}}  # Success response
+        elif data["method"] == "CancelTransaction":
+            return {"result": {"cancel_time": 123456789, "state": -1}}  # Cancel response
+        else:
+            raise HTTPException(status_code=400, detail="Unknown method")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error in webhook: {str(e)}")

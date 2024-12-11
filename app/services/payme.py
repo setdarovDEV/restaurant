@@ -10,10 +10,11 @@ class PaymeClient:
         self.secret_key = secret_key
         self.base_url = "https://checkout.test.paycom.uz/api" if test_mode else "https://checkout.paycom.uz/api"
 
-    def _generate_signature(self, params: Dict):
+    def _generate_signature(self, params: Dict) -> str:
         # JSON string yaratib, SHA1 hash hisoblash
-        payload = json.dumps(params)
-        return hashlib.sha1((payload + self.secret_key).encode()).hexdigest()
+        # Parametrlar JSON formatida tartiblangan bo'lishi kerak
+        sorted_params = json.dumps(params, separators=(',', ':'))
+        return hashlib.sha1((sorted_params + self.secret_key).encode()).hexdigest()
 
     def create_invoice(self, amount: int, order_id: str) -> Dict:
         payload = {
