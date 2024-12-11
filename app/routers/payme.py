@@ -30,7 +30,7 @@ async def check_status(transaction_id: str):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@payme_router.post("/payme/webhook/")
+@payme_router.post("/webhook")
 async def webhook(data: dict):
     if data["method"] == "PerformTransaction":
         order_id = data["params"]["account"]["order_id"]
