@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ecee8036-8566-40d8-b07e-84f68cba5a98" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/alembic.ini" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/alembic/README" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/alembic/env.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/alembic/script.py.mako" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routers/payme.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/payme.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/payme.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/payme.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ngrok.yml" beforeDir="false" />
-    </list>
+    <list default="true" id="ecee8036-8566-40d8-b07e-84f68cba5a98" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -85,7 +76,7 @@
       <workItem from="1733841557599" duration="7358000" />
       <workItem from="1733900856169" duration="6342000" />
       <workItem from="1733987814052" duration="1319000" />
-      <workItem from="1734152095336" duration="5869000" />
+      <workItem from="1734152095336" duration="6549000" />
     </task>
     <servers />
   </component>
