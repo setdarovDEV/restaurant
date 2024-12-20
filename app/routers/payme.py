@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from typing import Union
+from typing import Union, Optional
 
 router = APIRouter()
 
 # Account model
 class Account(BaseModel):
-    phone: str = None  # Telefon raqami optional
+    phone: Optional[str] = None  # Telefon raqami optional
 
 
 # Parametrlar uchun umumiy bazaviy klasslar
@@ -49,7 +49,7 @@ class JSONRPCRequest(BaseModel):
     jsonrpc: str
     id: int
     method: str
-    params: Union[
+    params: Optional[Union[
         CheckPerformTransactionParams,
         CreateTransactionParams,
         PerformTransactionParams,
@@ -57,7 +57,7 @@ class JSONRPCRequest(BaseModel):
         CheckTransactionParams,
         GetStatementParams,
         ChangePasswordParams
-    ]
+    ]] = None
 
 
 @router.post("/payment/update", status_code=200)
@@ -137,4 +137,5 @@ async def handle_payment_request(request: JSONRPCRequest):
 
     else:
         # Agar method noto'g'ri bo'lsa
+        error_response["error"]["code"] = -32601  # Method not found
         return JSONResponse(status_code=400, content=error_response)
