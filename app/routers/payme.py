@@ -1,8 +1,8 @@
+import uuid
 from urllib.request import Request
-
 from fastapi import APIRouter, HTTPException
 
-from app.schemas import CheckPerformResponse, CheckPerformRequest
+from app.schemas import Account, CheckPerformTransactionRequest
 from app.services.payme import PaymeClient
 import os
 import httpx
@@ -19,35 +19,42 @@ ORDERS = {
     "1": {"status": "awaiting_payment", "amount": 10000},  # Misol uchun mavjud order
 }
 
-@payme_router.post("/check-perform", response_model=CheckPerformResponse)
-async def check_perform_transaction(request: CheckPerformRequest):
-    order_id = request.account.get("order_id")
-    amount = request.amount
 
-    if order_id not in ORDERS:
-        raise HTTPException(status_code=400, detail="Order does not exist")
+@payme_router.post("/check")
+async def check_perform_transaction(request: dict):
+    # Parsing JSON-RPC request parameters
+    jsonrpc = request.get("jsonrpc")
+    request_id = request.get("id")
+    method = request.get("method")
+    params = request.get("params")
 
-    order = ORDERS[order_id]
+    # Check if the method is CheckPerformTransaction
+    if method != "CheckPerformTransaction":
+        raise HTTPException(status_code=400, detail="Invalid method")
 
-    if amount != order["amount"]:
+    # Extract parameters
+    amount = params.get("amount")
+    account = params.get("account")
+
+    # Basic validation of amount and account
+    if not amount or amount <= 0:
         raise HTTPException(status_code=400, detail="Invalid amount")
 
-    if order["status"] == "awaiting_payment":
-        return {"allow": True, "message": "Transaction is allowed"}
-    elif order["status"] == "processing":
-        raise HTTPException(status_code=400, detail="Order is already being processed")
-    elif order["status"] == "completed":
-        raise HTTPException(status_code=400, detail="Order is already paid or cancelled")
-    else:
-        raise HTTPException(status_code=400, detail="Invalid order status")
+    if not account or not account.get("account_number"):
+        raise HTTPException(status_code=400, detail="Invalid account information")
 
-@payme_router.post("/webhook")
-async def webhook(data: dict):
-    if data["method"] == "PerformTransaction":
-        order_id = data["params"]["account"]["order_id"]
-        transaction_id = data["params"]["id"]
-        return {"result": {"perform_time": 123456789, "state": 1}}
-    elif data["method"] == "CancelTransaction":
-        return {"result": {"cancel_time": 123456789, "state": -1}}
-    else:
-        raise HTTPException(status_code=400, detail="Unknown method")
+    # Perform transaction check logic
+    transaction_id = str(uuid.uuid4())  # Generate a unique transaction ID
+
+    # Simulate a success response (you can integrate with a payment gateway here)
+    response = {
+        "jsonrpc": jsonrpc,
+        "id": request_id,
+        "result": {
+            "status": "success",
+            "message": "To'lovni amalga oshirishga ruxsat berildi.",
+            "transaction_id": transaction_id
+        }
+    }
+
+    return response

@@ -300,14 +300,6 @@ class TableRevenueResponse(BaseModel):
 class PeriodicRevenueResponse(BaseModel):
     revenue: Optional[float] = 0.0
 
-class CheckPerformRequest(BaseModel):
-    account: dict
-    amount: int
-
-class CheckPerformResponse(BaseModel):
-    allow: bool
-    message: str
-
 class BusinessBase(BaseModel):
     name: str
     location: str
@@ -335,3 +327,12 @@ class BusinessResponse(BaseModel):
 
 class BusinessUpdateDays(BaseModel):
     additional_days: int
+
+class Account(BaseModel):
+    account_number: str = None
+    account_holder: str = None
+    bank: str = None
+
+class CheckPerformTransactionRequest(BaseModel):
+    amount: float
+    account: Account

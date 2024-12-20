@@ -22,7 +22,7 @@ app.include_router(menu_router, prefix="/menu", tags=["Menu"])
 app.include_router(table_router, prefix="/table", tags=["Table"])
 app.include_router(reservation_router, prefix="/reservation", tags=["Reservation"])
 app.include_router(statistics_router, prefix="/statistics", tags=["Statistics"])
-app.include_router(payme_router, prefix="/payme", tags=["Payme"])
+app.include_router(payme_router, prefix="/payments", tags=["Payme"])
 app.include_router(dev_router, prefix="/dev", tags=["Dev"])
 
 
