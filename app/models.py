@@ -4,25 +4,25 @@ from email.policy import default
 from pydantic import validator
 from sqlalchemy import Enum as SqlEnum, Float
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, TIMESTAMP, func
+from sqlalchemy.sql import text
 from datetime import datetime
 from sqlalchemy.orm import relationship
 
 
 Base = declarative_base()
-# Toshkent vaqt zonasini o'rnatish
 
 class RoleEnum(str, enum.Enum):
     NAZORATCHI = "NAZORATCHI"
     AFISSANT = "AFISSANT"
     HODIM = "HODIM"
     USER = "USER"
+    DEVELOPER = "DEVELOPER"
 
 
 class TableStatus(str, enum.Enum):
     AVAILABLE = "AVAILABLE"
     RESERVED = "RESERVED"
-
 
 class User(Base):
     __tablename__ = 'users'
@@ -95,9 +95,9 @@ class Floor(Base):
     __tablename__ = 'floors'
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)  # Etajning nomi (1-etaj, 2-etaj, va hokazo)
+    name = Column(String, nullable=False)
 
-    modules = relationship("Module", back_populates="floor")  # Modullar bilan bog‘lanish
+    modules = relationship("Module", back_populates="floor")
 
 
 class Table(Base):
@@ -135,3 +135,24 @@ class Module(Base):
         remote_side=[id],
         backref="sub_modules"
     )
+
+class Business(Base):
+    __tablename__ = "businesses"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)  # Biznes nomi
+    location = Column(String, nullable=False)  # Joylashuv
+    image = Column(String, nullable=True)  # Biznes rasmi
+    is_paid = Column(Boolean, default=False)  # To'lov holati
+    payment_expiry_date = Column(DateTime, nullable=True)  # To'lov muddati
+
+    # Tizimga qo'shilgan vaqtlar
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Developer va Nazoratchi bilan bog‘lanishlar
+    developer_id = Column(Integer, ForeignKey("users.id"), nullable=False)  # Developer
+    nazoratchi_id = Column(Integer, ForeignKey("users.id"), nullable=True)  # Nazoratchi
+
+    developer = relationship("User", foreign_keys=[developer_id])
+    nazoratchi = relationship("User", foreign_keys=[nazoratchi_id])

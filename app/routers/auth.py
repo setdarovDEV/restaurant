@@ -15,7 +15,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import models, schemas, database
 from app.database import SessionLocal
-from app.permission import is_nazoratchi
+from app.permission import is_nazoratchi, is_developer
 from app.models import User, RoleEnum
 from app.settings import Settings
 from app.schemas import UserLogin, UserResponse
@@ -74,6 +74,12 @@ def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
 
+    if user.username == "backend-bmgsoft":
+        user.role = RoleEnum.DEVELOPER
+    else:
+        user.role = RoleEnum.USER
+
+
     if user.username == "adminadmin7777":
         user.role = RoleEnum.NAZORATCHI
     else:
@@ -104,15 +110,10 @@ def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
     }
 
 
-@auth_router.get('/', status_code=status.HTTP_200_OK, response_model=List[schemas.UserResponse], dependencies=[Depends(is_nazoratchi)])
-async def get_users(db: Session = Depends(database.get_db), Authorize: AuthJWT = Depends()):
-    try:
-        Authorize.jwt_required()
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Enter valid access token")
+@auth_router.get("/", response_model=List[schemas.UserResponse], dependencies=[Depends(is_developer)])
+async def get_users(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
 
-    users = db.query(User).all()
+    users = db.query(models.User).all()
     return users
 
 
@@ -219,13 +220,12 @@ def update_user(user: schemas.UserBase, Authorize: AuthJWT = Depends(), db: Sess
     return db_user
 
 
-@auth_router.delete("/users/{user_id}", response_model=dict)
+@auth_router.delete("/{user_id}", response_model=dict)
 def delete_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(is_nazoratchi)):
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Foydalanuvchini o'chirish
     db.delete(user)
     db.commit()
 

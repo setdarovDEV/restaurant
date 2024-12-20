@@ -23,6 +23,11 @@ def get_current_user(Authorize: AuthJWT = Depends()):
     except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid or missing token")
 
+def is_developer(Authorize: AuthJWT = Depends()):
+    user_role =  get_current_user(Authorize)
+    if not user_role != "DEVELOPER":
+        raise HTTPException(status_code=403, detail="Access forbidden: Insufficient permissions")
+
 # NAZORATCHI ruxsati
 def is_nazoratchi(Authorize: AuthJWT = Depends()):
     user_role = get_current_user(Authorize)

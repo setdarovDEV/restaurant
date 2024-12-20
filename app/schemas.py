@@ -1,12 +1,10 @@
 from __future__ import annotations
 import pytz
-from pydantic import BaseModel, EmailStr, validator
+from pydantic import BaseModel, EmailStr, validator, HttpUrl
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum#
 from app.models import RoleEnum, TableStatus
-
-
 
 # User Schemas
 class UserBase(BaseModel):
@@ -34,7 +32,7 @@ class UserResponse(BaseModel):
     username: str
     first_name: str
     last_name: str
-    phone_number: str
+    phone_number: Optional[str] = None
     role: RoleEnum
 
     class Config:
@@ -302,6 +300,38 @@ class TableRevenueResponse(BaseModel):
 class PeriodicRevenueResponse(BaseModel):
     revenue: Optional[float] = 0.0
 
-class PaymentRequest(BaseModel):
-    order_id: str
+class CheckPerformRequest(BaseModel):
+    account: dict
     amount: int
+
+class CheckPerformResponse(BaseModel):
+    allow: bool
+    message: str
+
+class BusinessBase(BaseModel):
+    name: str
+    location: str
+    image: Optional[HttpUrl]
+    is_paid: Optional[bool] = False
+
+
+class BusinessCreate(BaseModel):
+    name: str
+    location: str
+    image: str
+    is_paid: Optional[bool]
+    payment_days: Optional[int] = None
+
+class BusinessResponse(BaseModel):
+    id: int
+    name: str
+    location: str
+    image: str
+    is_paid: Optional[bool] = False
+    payment_expiry_date: Optional[datetime] = None
+
+    class Config:
+        orm_mode = True
+
+class BusinessUpdateDays(BaseModel):
+    additional_days: int
