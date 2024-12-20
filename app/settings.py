@@ -7,8 +7,9 @@ class Settings(BaseSettings):
     authjwt_secret_key: str = "SECRET_KEY"
     # boshqa sozlamalarni shu yerda qo'shishingiz mumkin
 
-class PayMeSettings:
-    BASE_URL = os.getenv("DOMAIN_URL")
-    MERCHANT_ID = os.getenv("MERCHANT_ID")
-    SECRET_KEY = os.getenv("SECRET_KEY")
-    CALLBACK_URL = os.getenv("CALLBACK_URL")
+PAYME_ID = "675939f5e64d929b0e4760a4"
+PAYME_KEY = "kXdjH?Ji#J4ts3mfmSxm&em77Z6tsc?0V%NM"
+PAYME_ACCOUNT_FIELD = "order_id"
+PAYME_AMOUNT_FIELD = "total_amount"
+PAYME_ACCOUNT_MODEL = "app.models.Order"  # Model yo'li
+PAYME_ONE_TIME_PAYMENT = True

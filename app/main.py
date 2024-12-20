@@ -1,17 +1,21 @@
 from datetime import timedelta
 from fastapi.responses import FileResponse, StreamingResponse
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
+from fastapi.responses import JSONResponse
 
 from app.routers.auth import auth_router
 from app.routers.orders import order_router
 from app.routers.menu import menu_router
-from app.routers.payme import payme_router
 from app.routers.statistics import statistics_router
 from app.routers.table import table_router
 from app.routers.reservation import reservation_router
 from app.routers.developer import dev_router
+from app.routers.payme import router as payme_router
+
+from payme import Payme
+
 
 
 app = FastAPI()
@@ -22,8 +26,8 @@ app.include_router(menu_router, prefix="/menu", tags=["Menu"])
 app.include_router(table_router, prefix="/table", tags=["Table"])
 app.include_router(reservation_router, prefix="/reservation", tags=["Reservation"])
 app.include_router(statistics_router, prefix="/statistics", tags=["Statistics"])
-app.include_router(payme_router, prefix="/payments", tags=["Payme"])
 app.include_router(dev_router, prefix="/dev", tags=["Dev"])
+app.include_router(payme_router, prefix="/payme", tags=["Payme"])
 
 
 class Settings(BaseModel):
@@ -40,3 +44,4 @@ def get_config():
 @app.get("/")
 async def root():
     return {"message": "Welcome to restaurant project"}
+

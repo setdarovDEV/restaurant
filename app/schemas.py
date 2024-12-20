@@ -327,12 +327,3 @@ class BusinessResponse(BaseModel):
 
 class BusinessUpdateDays(BaseModel):
     additional_days: int
-
-class Account(BaseModel):
-    account_number: str = None
-    account_holder: str = None
-    bank: str = None
-
-class CheckPerformTransactionRequest(BaseModel):
-    amount: float
-    account: Account
