@@ -10,10 +10,20 @@ from app.schemas import OrderCreate
 
 order_router = APIRouter()
 
+
 # Buyurtma yaratish - faqat USER va AFISSANT buyurtma qilishi mumkin
 @order_router.post("/make", response_model=OrderCreate)
 def make_order(order: OrderCreate, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     Authorize.jwt_required()
+
+    # Foydalanuvchining roli
+    current_user = db.query(models.User).filter(models.User.id == Authorize.get_jwt_subject()).first()
+
+    if current_user.role not in ["USER", "AFISSANT"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only USER and AFISSANT can create orders"
+        )
 
     # Menu va stolni tekshirish
     menu = db.query(Menu).filter(Menu.id == order.menu_id).first()
@@ -30,11 +40,11 @@ def make_order(order: OrderCreate, Authorize: AuthJWT = Depends(), db: Session =
 
     # Yangi buyurtma yaratish
     new_order = Order(
-        user_id=Authorize.get_jwt_subject(),  # JWT tokenidan user_id olish
+        user_id=current_user.id,
         menu_id=order.menu_id,
         table_id=order.table_id,
         quantity=order.quantity,
-        price=price,  # Hisoblangan narxni kiritamiz
+        price=price,
         status=order.status,
     )
 
@@ -54,6 +64,7 @@ def get_order(order_id: int, db: Session = Depends(get_db), current_user: models
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Buyurtma topilmadi")
     return order
 
+
 # Foydalanuvchining barcha buyurtmalarini olish - faqat USER foydalanishi mumkin
 @order_router.get("/", response_model=schemas.OrderHistory, dependencies=[Depends(is_user)])
 def get_user_orders(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
@@ -61,16 +72,20 @@ def get_user_orders(db: Session = Depends(get_db), current_user: models.User = D
     orders = db.query(models.Order).filter(models.Order.user_id == current_user.id).all()
     return {"orders": orders}
 
+
 # Buyurtmani yangilash - faqat HODIM va NAZORATCHI yangilashi mumkin
-@order_router.put("/{order_id}", response_model=schemas.OrderResponse, dependencies=[Depends(is_hodim)])
-def update_order(order_id: int, order_update: schemas.OrderUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+@order_router.put("/{order_id}", response_model=schemas.OrderResponse, dependencies=[Depends(is_nazoratchi)])
+def update_order(order_id: int, order_update: schemas.OrderUpdate, db: Session = Depends(get_db),
+                 current_user: models.User = Depends(get_current_user)):
     order = db.query(models.Order).filter(models.Order.id == order_id).first()
     if not order:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Buyurtma topilmadi")
+
     order.status = order_update.status
     db.commit()
     db.refresh(order)
     return order
+
 
 # Buyurtmani o'chirish - faqat NAZORATCHI o'chirishi mumkin
 @order_router.delete("/{order_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(is_nazoratchi)])
@@ -83,14 +98,16 @@ def delete_order(order_id: int, db: Session = Depends(get_db), current_user: mod
     db.commit()
     return None
 
+
 # Buyurtma statusini yangilash - faqat NAZORATCHI yangilashi mumkin
 @order_router.put("/{order_id}/status", response_model=schemas.OrderResponse, dependencies=[Depends(is_nazoratchi)])
-def update_order_status(order_id: int, order_update: schemas.OrderUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+def update_order_status(order_id: int, order_update: schemas.OrderUpdate, db: Session = Depends(get_db),
+                        current_user: models.User = Depends(get_current_user)):
     order = db.query(models.Order).filter(models.Order.id == order_id).first()
     if not order:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Buyurtma topilmadi")
+
     order.status = order_update.status
     db.commit()
     db.refresh(order)
     return order
-
