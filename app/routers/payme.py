@@ -1,141 +1,187 @@
-from pydantic import BaseModel
+# from pydantic import BaseModel
+# from fastapi import APIRouter, HTTPException
+# from fastapi.responses import JSONResponse
+# from typing import Union, Optional
+#
+# router = APIRouter()
+#
+# # Account model
+# class Account(BaseModel):
+#     phone: Optional[str] = None  # Telefon raqami optional
+#
+#
+# # Parametrlar uchun umumiy bazaviy klasslar
+# class CheckPerformTransactionParams(BaseModel):
+#     amount: int
+#     account: Account
+#
+#
+# class CreateTransactionParams(BaseModel):
+#     id: str
+#     time: int
+#     amount: int
+#     account: Account
+#
+#
+# class PerformTransactionParams(BaseModel):
+#     id: str
+#
+#
+# class CancelTransactionParams(BaseModel):
+#     id: str
+#
+#
+# class CheckTransactionParams(BaseModel):
+#     id: str
+#
+#
+# class GetStatementParams(BaseModel):
+#     from_time: int
+#     to_time: int
+#
+#
+# class ChangePasswordParams(BaseModel):
+#     password: str
+#
+#
+# # Request uchun umumiy format
+# class JSONRPCRequest(BaseModel):
+#     jsonrpc: str
+#     id: int
+#     method: str
+#     params: Optional[Union[
+#         CheckPerformTransactionParams,
+#         CreateTransactionParams,
+#         PerformTransactionParams,
+#         CancelTransactionParams,
+#         CheckTransactionParams,
+#         GetStatementParams,
+#         ChangePasswordParams
+#     ]] = None
+#
+#
+# @router.post("/payment/update", status_code=200)
+# async def handle_payment_request(request: JSONRPCRequest):
+#     """
+#     Bitta endpoint orqali barcha turdagi JSON-RPC so'rovlarini qabul qilish va
+#     kerakli javobni qaytarish.
+#     """
+#     if request.jsonrpc != "2.0":
+#         raise HTTPException(status_code=400, detail="Invalid JSON-RPC version.")
+#
+#     # Success Response Template
+#     success_response = {
+#         "jsonrpc": "2.0",
+#         "id": request.id,
+#         "result": {
+#             "id": "1288",  # Real response'dan olgan ID
+#             "time": 1399114284039,  # Real response'dan olgan time
+#             "receivers": [
+#                 {
+#                     "id": "5305e3bab097f420a62ced0b",  # Receiver ID
+#                     "amount": 500000  # Amount for receiver
+#                 }
+#             ]
+#         }
+#     }
+#
+#     # Error Response Template
+#     error_response = {
+#         "jsonrpc": "2.0",
+#         "id": request.id,
+#         "error": {
+#             "code": -31050,
+#             "message": {
+#                 "ru": "Номер телефона не найден",
+#                 "uz": "Raqam ro'yhatda yo'q",
+#                 "en": "Phone number not found"
+#             },
+#             "data": "phone"
+#         }
+#     }
+#
+#     # CheckPerformTransaction logikasi
+#     if request.method == "CheckPerformTransaction":
+#         success_response["result"]["message"] = "Transaction checked."
+#         return JSONResponse(status_code=200, content=success_response)
+#
+#     # CreateTransaction logikasi
+#     elif request.method == "CreateTransaction":
+#         success_response["result"]["message"] = "Transaction created."
+#         return JSONResponse(status_code=200, content=success_response)
+#
+#     # PerformTransaction logikasi
+#     elif request.method == "PerformTransaction":
+#         success_response["result"]["message"] = "Transaction performed."
+#         return JSONResponse(status_code=200, content=success_response)
+#
+#     # CancelTransaction logikasi
+#     elif request.method == "CancelTransaction":
+#         success_response["result"]["message"] = "Transaction cancelled."
+#         return JSONResponse(status_code=200, content=success_response)
+#
+#     # CheckTransaction logikasi
+#     elif request.method == "CheckTransaction":
+#         success_response["result"]["message"] = "Transaction checked."
+#         return JSONResponse(status_code=200, content=success_response)
+#
+#     # GetStatement logikasi
+#     elif request.method == "GetStatement":
+#         success_response["result"]["message"] = "Statement generated."
+#         return JSONResponse(status_code=200, content=success_response)
+#
+#     # ChangePassword logikasi
+#     elif request.method == "ChangePassword":
+#         success_response["result"]["message"] = "Password changed."
+#         return JSONResponse(status_code=200, content=success_response)
+#
+#     else:
+#         # Agar method noto'g'ri bo'lsa
+#         error_response["error"]["code"] = -32601  # Method not found
+#         return JSONResponse(status_code=400, content=error_response)
+
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import JSONResponse
-from typing import Union, Optional
+import httpx
+
+async def create_transaction(amount: int, order_id: str):
+    url = "https://checkout.paycom.uz/api"
+    data = {
+        "method": "CreateTransaction",
+        "params": {
+            "amount": amount * 100,  # So'mni tiyinlarga aylantirish
+            "account": {"order_id": order_id}
+        }
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, headers=headers, json=data)
+        return response.json()
+
 
 router = APIRouter()
 
-# Account model
-class Account(BaseModel):
-    phone: Optional[str] = None  # Telefon raqami optional
+@router.post("/payment/update")
+async def payme_create_transaction(amount: int, order_id: str):
+    try:
+        response = await create_transaction(amount, order_id)
+        if response.get("error"):
+            raise HTTPException(status_code=400, detail=response["error"]["message"])
+        return {"success": True, "data": response["result"]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-
-# Parametrlar uchun umumiy bazaviy klasslar
-class CheckPerformTransactionParams(BaseModel):
-    amount: int
-    account: Account
-
-
-class CreateTransactionParams(BaseModel):
-    id: str
-    time: int
-    amount: int
-    account: Account
-
-
-class PerformTransactionParams(BaseModel):
-    id: str
-
-
-class CancelTransactionParams(BaseModel):
-    id: str
-
-
-class CheckTransactionParams(BaseModel):
-    id: str
-
-
-class GetStatementParams(BaseModel):
-    from_time: int
-    to_time: int
-
-
-class ChangePasswordParams(BaseModel):
-    password: str
-
-
-# Request uchun umumiy format
-class JSONRPCRequest(BaseModel):
-    jsonrpc: str
-    id: int
-    method: str
-    params: Optional[Union[
-        CheckPerformTransactionParams,
-        CreateTransactionParams,
-        PerformTransactionParams,
-        CancelTransactionParams,
-        CheckTransactionParams,
-        GetStatementParams,
-        ChangePasswordParams
-    ]] = None
-
-
-@router.post("/payment/update", status_code=200)
-async def handle_payment_request(request: JSONRPCRequest):
-    """
-    Bitta endpoint orqali barcha turdagi JSON-RPC so'rovlarini qabul qilish va
-    kerakli javobni qaytarish.
-    """
-    if request.jsonrpc != "2.0":
-        raise HTTPException(status_code=400, detail="Invalid JSON-RPC version.")
-
-    # Success Response Template
-    success_response = {
-        "jsonrpc": "2.0",
-        "id": request.id,
-        "result": {
-            "id": "1288",  # Real response'dan olgan ID
-            "time": 1399114284039,  # Real response'dan olgan time
-            "receivers": [
-                {
-                    "id": "5305e3bab097f420a62ced0b",  # Receiver ID
-                    "amount": 500000  # Amount for receiver
-                }
-            ]
-        }
-    }
-
-    # Error Response Template
-    error_response = {
-        "jsonrpc": "2.0",
-        "id": request.id,
-        "error": {
-            "code": -31050,
-            "message": {
-                "ru": "Номер телефона не найден",
-                "uz": "Raqam ro'yhatda yo'q",
-                "en": "Phone number not found"
-            },
-            "data": "phone"
-        }
-    }
-
-    # CheckPerformTransaction logikasi
-    if request.method == "CheckPerformTransaction":
-        success_response["result"]["message"] = "Transaction checked."
-        return JSONResponse(status_code=200, content=success_response)
-
-    # CreateTransaction logikasi
-    elif request.method == "CreateTransaction":
-        success_response["result"]["message"] = "Transaction created."
-        return JSONResponse(status_code=200, content=success_response)
-
-    # PerformTransaction logikasi
-    elif request.method == "PerformTransaction":
-        success_response["result"]["message"] = "Transaction performed."
-        return JSONResponse(status_code=200, content=success_response)
-
-    # CancelTransaction logikasi
-    elif request.method == "CancelTransaction":
-        success_response["result"]["message"] = "Transaction cancelled."
-        return JSONResponse(status_code=200, content=success_response)
-
-    # CheckTransaction logikasi
-    elif request.method == "CheckTransaction":
-        success_response["result"]["message"] = "Transaction checked."
-        return JSONResponse(status_code=200, content=success_response)
-
-    # GetStatement logikasi
-    elif request.method == "GetStatement":
-        success_response["result"]["message"] = "Statement generated."
-        return JSONResponse(status_code=200, content=success_response)
-
-    # ChangePassword logikasi
-    elif request.method == "ChangePassword":
-        success_response["result"]["message"] = "Password changed."
-        return JSONResponse(status_code=200, content=success_response)
-
-    else:
-        # Agar method noto'g'ri bo'lsa
-        error_response["error"]["code"] = -32601  # Method not found
-        return JSONResponse(status_code=400, content=error_response)
+@router.post("/payme/webhook")
+async def payme_webhook(request: dict):
+    # Webhookdan kelgan ma'lumotni qayta ishlash
+    if request.get("method") == "CheckPerformTransaction":
+        # Buyurtma tekshirish logikasi
+        pass
+    elif request.get("method") == "CheckTransaction":
+        # Tranzaktsiyani tekshirish logikasi
+        pass
+    elif request.get("method") == "PerformTransaction":
+        # Tranzaktsiyani tasdiqlash logikasi
+        pass
+    elif request.get("method") == "CancelTransaction":
+        # Tranzaktsiyani bekor qilish logikasi
+        pass
+    return {"result": {"success": True}}
