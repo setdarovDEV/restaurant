@@ -54,6 +54,15 @@ class Order(Base):
     user = relationship("User", back_populates="orders")
     menu = relationship("Menu", back_populates="orders")
     table = relationship("Table", back_populates="orders")
+    transactions = relationship("PaymeTransactions", back_populates="account")
+
+    def deduct_stock(self):
+        # Your logic to deduct stock and mark the order as paid
+        self.status = "PAID"
+
+    def restore_stock(self):
+        # Your logic to restore stock and undo payment
+        self.status = "CANCELLED"
 
 
 class Menu(Base):
@@ -146,13 +155,22 @@ class Business(Base):
     is_paid = Column(Boolean, default=False)  # To'lov holati
     payment_expiry_date = Column(DateTime, nullable=True)  # To'lov muddati
 
-    # Tizimga qo'shilgan vaqtlar
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Developer va Nazoratchi bilan bog‘lanishlar
     developer_id = Column(Integer, ForeignKey("users.id"), nullable=False)  # Developer
     nazoratchi_id = Column(Integer, ForeignKey("users.id"), nullable=True)  # Nazoratchi
 
     developer = relationship("User", foreign_keys=[developer_id])
     nazoratchi = relationship("User", foreign_keys=[nazoratchi_id])
+
+class PaymeTransactions(Base):
+    __tablename__ = "payme_transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    transaction_id = Column(String, unique=True, index=True)
+    account_id = Column(Integer, ForeignKey("orders.id"))
+    amount = Column(Float)
+    status = Column(String)  # CREATED, SUCCESSFUL, CANCELLED
+
+    account = relationship("Order", back_populates="transactions")
