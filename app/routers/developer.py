@@ -1,18 +1,16 @@
-from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_jwt_auth import AuthJWT
 from fastapi_utils.tasks import repeat_every
-from psycopg2 import IntegrityError
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 from sqlalchemy.orm import Session
 from app import schemas, models
 from app.database import get_db
-from app.models import RoleEnum, Business
-from app.permission import is_developer
+from app.models import RoleEnum, Business, User
+from app.permission import is_developer, is_nazoratchi
 from app.dependencies import get_current_user
 from datetime import datetime, timedelta
 
-from app.schemas import BusinessUpdateDays
+from app.schemas import BusinessUpdateDays, UserResponseBusiness, UserCreateBusiness
 
 dev_router = APIRouter()
 
@@ -79,7 +77,7 @@ async def create_business(
 def hash_password(password: str) -> str:
     return generate_password_hash(password)
 
-@dev_router.post("/{business_id}/user", status_code=201, response_model=schemas.UserResponse, dependencies=[Depends(is_developer)])
+@dev_router.post("/{business_id}/user", status_code=201, response_model=schemas.BusinessAndUserConnect, dependencies=[Depends(is_developer)])
 async def create_user_for_business(
     business_id: int,
     user: schemas.UserCreate,  # User ma'lumotlari uchun schema
@@ -110,12 +108,12 @@ async def create_user_for_business(
     business.nazoratchi_id = new_user.id
     db.commit()
     db.refresh(business)
-
     return {
         "message": "User created and linked to the business successfully",
-        "user": new_user,
         "business": business,
+        "user": new_user
     }
+
 
 
 @dev_router.put("/business/{business_id}", status_code=200, dependencies=[Depends(is_developer)])
@@ -150,3 +148,38 @@ async def get_business(Authorize: AuthJWT = Depends(), db: Session = Depends(get
 
     business = db.query(Business).all()
     return business
+
+@dev_router.post("/{business_id}/create-user", status_code=201, response_model=schemas.UserResponseBusiness, dependencies=[Depends(is_nazoratchi)])
+async def create_employee_for_business(
+    business_id: int,
+    user: schemas.UserCreateBusiness,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    # 📌 **Biznes mavjudligini tekshirish**
+    business = db.query(models.Business).filter(models.Business.id == business_id).first()
+    if not business:
+        raise HTTPException(status_code=404, detail="Business not found")
+
+    # 📌 **Roleni tekshirish**
+    if user.role not in [models.RoleEnum.AFISSANT, models.RoleEnum.HODIM]:
+        raise HTTPException(status_code=400, detail="Only AFISSANT or HODIM roles can be created.")
+
+    # 📌 **Parolni hash qilish**
+    hashed_password = hash_password(user.password)
+
+    # 📌 **Yangi foydalanuvchini yaratish**
+    new_user = models.User(
+        username=user.username,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        phone_number=user.phone_number,
+        hashed_password=hashed_password,
+        role=user.role,
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user  # ✅ Foydalanuvchi qaytariladi

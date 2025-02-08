@@ -4,16 +4,17 @@ from fastapi import FastAPI, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
-
+import uvicorn
 from app.routers.auth import auth_router
 from app.routers.orders import order_router
 from app.routers.menu import menu_router
 from app.routers.statistics import statistics_router
 from app.routers.table import table_router
+from app.routers.floor import floors_router
+from app.routers.module import module_router
 from app.routers.reservation import reservation_router
 from app.routers.developer import dev_router
-from app.routers.payme import router as payme_router
-from payme import Payme
+from app.routers.payme import payme_router
 
 
 
@@ -23,6 +24,8 @@ app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(order_router, prefix="/orders", tags=["Orders"])
 app.include_router(menu_router, prefix="/menu", tags=["Menu"])
 app.include_router(table_router, prefix="/table", tags=["Table"])
+app.include_router(floors_router, prefix="/floor", tags=["Floor"])
+app.include_router(module_router, prefix="/module", tags=["Module"])
 app.include_router(reservation_router, prefix="/reservation", tags=["Reservation"])
 app.include_router(statistics_router, prefix="/statistics", tags=["Statistics"])
 app.include_router(dev_router, prefix="/dev", tags=["Dev"])
@@ -43,4 +46,3 @@ def get_config():
 @app.get("/")
 async def root():
     return {"message": "Welcome to restaurant project"}
-

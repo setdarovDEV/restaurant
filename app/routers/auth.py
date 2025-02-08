@@ -18,7 +18,7 @@ from app.database import SessionLocal
 from app.permission import is_nazoratchi, is_developer
 from app.models import User, RoleEnum
 from app.settings import Settings
-from app.schemas import UserLogin, UserResponse
+from app.schemas import UserLogin, UserResponse, UserCreate
 import datetime
 
 
@@ -112,9 +112,9 @@ def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
 
 @auth_router.get("/", response_model=List[schemas.UserResponse], dependencies=[Depends(is_developer)])
 async def get_users(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-
     users = db.query(models.User).all()
-    return users
+    return users  # ✅ Endi `UserResponseBusiness` formatida ishlaydi
+
 
 
 @auth_router.post('/login')
@@ -230,3 +230,31 @@ def delete_user(user_id: int, db: Session = Depends(get_db), current_user: User 
     db.commit()
 
     return {"status": "success", "message": "User deleted successfully"}
+
+
+@auth_router.post("{business_id}/create-user", response_model=UserResponse, dependencies=[Depends(is_nazoratchi)])
+def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
+    # 📌 Role ni tekshirish
+    if user_data.role not in [RoleEnum.AFISSANT, RoleEnum.HODIM, RoleEnum.USER]:
+        raise HTTPException(status_code=400, detail="Invalid role. Only AFISSANT, HODIM, or USER can be created.")
+
+    # 📌 Email yoki username allaqachon ishlatilganmi?
+    existing_user = db.query(User).filter((User.phone_number == user_data.phone_number) | (User.username == user_data.username)).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email or username already exists.")
+
+    # 📌 Parolni hash qilish
+    hashed_password = generate_password_hash(user_data.password)
+
+    # 📌 Foydalanuvchini yaratish
+    new_user = User(
+        username=user_data.username,
+        phone_number=user_data.phone_number,
+        hashed_password=hashed_password,
+        role=user_data.role
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user

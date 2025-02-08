@@ -1,8 +1,8 @@
 from __future__ import annotations
 import pytz
 from pydantic import BaseModel, EmailStr, validator, HttpUrl
-from typing import Optional, List
-from datetime import datetime
+from typing import Optional, List, ForwardRef
+from datetime import datetime, date
 from enum import Enum#
 from app.models import RoleEnum, TableStatus
 
@@ -75,7 +75,8 @@ class OrderCreate(BaseModel):
     menu_id: int
     quantity: int
     table_id: int
-    status: str
+    status: Optional[str]
+    business_id: Optional[int]
 
     @validator('quantity')
     def check_quantity(cls, v):
@@ -96,13 +97,19 @@ class OrderUpdate(BaseModel):
 
 class OrderResponse(BaseModel):
     id: int
+    business_id: int
+    user_id: int
     table_id: int
     menu_id: int
     quantity: int
-    status: str
+    price: float
+    status: OrderStatus
+    created_at: datetime
+    updated_at: Optional[datetime]  # ✅ Agar `updated_at` `NULL` bo‘lsa, xato bermasligi uchun Optional qilamiz
 
     class Config:
         orm_mode = True
+
 
 
 class Order(BaseModel):
@@ -121,7 +128,7 @@ class Order(BaseModel):
 
 
 class OrderHistory(BaseModel):
-    orders: list[Order]
+    orders: list[OrderResponse]
 
     class Config:
         orm_mode = True
@@ -148,44 +155,73 @@ class Table(BaseModel):
 
 # ReservationCreate class correction
 class ReservationCreate(BaseModel):
-    user_id: int
     table_id: int
-    start_time: datetime
-    end_time: datetime
-    is_active: bool = True
-
-    @validator('start_time', 'end_time')
-    def validate_times(cls, v):
-        if v < datetime.utcnow():
-            raise ValueError('Time cannot be in the past')
-        return v
-
-    class Config:
-        orm_mode = True
-
-    def local_create_time(self):
-        timezone = pytz.timezone('Asia/Tashkent')
-        return self.start_time.astimezone(timezone)
-
+    day: date
+    start_time: str
+    end_time: str
 
 class ReservationUpdate(BaseModel):
     table_number: int
-    start_time: datetime
-    end_time: datetime
+    day: str
+    start_time: str
+    end_time: str
     is_active: bool
 
+    @validator("day")
+    def validate_day(cls, value):
+        try:
+            return datetime.strptime(value, "%Y-%m-%d").date()
+        except ValueError:
+            raise ValueError("Invalid day format. Use YYYY-MM-DD")
+
+    @validator("start_time", "end_time")
+    def validate_time(cls, value):
+        try:
+            return datetime.strptime(value, "%H:%M").time()
+        except ValueError:
+            raise ValueError("Invalid time format. Use HH:MM")
+
+class ReservationPatch(BaseModel):
+    table_number: Optional[int] = None
+    day: Optional[str] = None  # 📌 Agar `start_time` yoki `end_time` kiritilsa, `day` ham kerak bo‘ladi
+    start_time: Optional[str] = None  # ✅ `str` formatida qabul qiladi
+    end_time: Optional[str] = None  # ✅ `str` formatida qabul qiladi
+    is_active: Optional[bool] = None
+
+    @validator("day", pre=True, always=True)
+    def validate_day(cls, value):
+        """ 📌 `day` maydonini tekshirish va `datetime.date` formatiga o‘tkazish """
+        if value is None:
+            return None
+        try:
+            return datetime.strptime(value, "%Y-%m-%d").date()
+        except ValueError:
+            raise ValueError("Invalid day format. Use YYYY-MM-DD")
+
+    @validator("start_time", "end_time", pre=True, always=True)
+    def validate_time(cls, value):
+        """ 📌 `start_time` va `end_time` ni tekshirish, lekin `str` formatida qoldirish """
+        if value is None:  # ✅ `None` qiymatni qaytaramiz
+            return None
+        try:
+            datetime.strptime(value, "%H:%M")  # ✅ Format to‘g‘ri bo‘lsa, davom etamiz
+            return value  # ✅ `str` ko‘rinishda qoldiramiz
+        except ValueError:
+            raise ValueError("Invalid time format. Use HH:MM")
+
+TableRef = ForwardRef("TableInDB")
 
 class ReservationResponse(BaseModel):
     id: int
     user_id: int
-    table_id: int
+    table: Optional[TableInDB]  # 📌 Endi `table` `None` bo‘lishi mumkin
     start_time: datetime
     end_time: datetime
     is_active: bool
+    business_id: int
 
     class Config:
         orm_mode = True
-
 
 # TableStatus enum
 class TableStatus(str, Enum):
@@ -209,8 +245,14 @@ class TableCreate(BaseModel):
         orm_mode = True
 
 class TableUpdate(BaseModel):
+    table_number: Optional[int] = None
+    description: Optional[str] = None
     capacity: Optional[int] = None
-    status: Optional[TableStatus] = None
+    status: Optional[str] = None
+    module_id: Optional[int] = None
+
+    class Config:
+        orm_mode = True
 
 class TableInDB(BaseModel):
     id: int
@@ -256,9 +298,18 @@ class ModuleCreate(BaseModel):
         orm_mode = True
 
 
+class ModuleUpdate(BaseModel):
+    name: Optional[str] = None
+    floor_id: Optional[int] = None
+
+    class Config:
+        orm_mode = True  # Bu SQLAlchemy bilan ishlash uchun kerak
+
+
+
 class Floor(FloorBase):
     id: int
-    modules: List[ModuleSchema] = []
+    modules: List[ModuleSchema]
 
     class Config:
         orm_mode = True
@@ -271,7 +322,7 @@ class ModuleSchema(ModuleBase):
 
 class FloorInDB(FloorBase):
     id: int
-    modules: List[ModuleSchema] = []
+    modules: List[ModuleSchema]
 
     class Config:
         orm_mode = True
@@ -327,3 +378,33 @@ class BusinessResponse(BaseModel):
 
 class BusinessUpdateDays(BaseModel):
     additional_days: int
+
+class BusinessAndUserConnect(BaseModel):
+    message: str
+    business: BusinessResponse
+    user_id: UserResponse
+
+
+class UserCreateBusiness(BaseModel):
+    username: str
+    first_name: str
+    last_name: str
+    phone_number: str
+    password: str
+    role: RoleEnum  # ✅ Faqat `AFISSANT` yoki `HODIM` qabul qiladi
+
+
+class UserResponseBusiness(BaseModel):
+    id: int
+    username: str
+    first_name: str
+    last_name: str
+    phone_number: str
+    role: RoleEnum
+
+    class Config:
+        orm_mode = True
+
+
+
+ReservationResponse.update_forward_refs()

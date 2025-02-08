@@ -25,7 +25,7 @@ def get_current_user(Authorize: AuthJWT = Depends()):
 
 def is_developer(Authorize: AuthJWT = Depends()):
     user_role =  get_current_user(Authorize)
-    if not user_role != "DEVELOPER":
+    if user_role != "DEVELOPER":
         raise HTTPException(status_code=403, detail="Access forbidden: Insufficient permissions")
 
 # NAZORATCHI ruxsati

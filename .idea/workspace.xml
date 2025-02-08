@@ -5,10 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ecee8036-8566-40d8-b07e-84f68cba5a98" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/routers/floor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/routers/module.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/django_payments/payments/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/restaurant.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/restaurant.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/permission.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/permission.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routers/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routers/developer.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/developer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routers/menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routers/orders.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/orders.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routers/payme.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/payme.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routers/reservation.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/reservation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routers/statistics.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/statistics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routers/table.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/table.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/payme.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,7 +41,20 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;setdarovDEV&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/setdarovDEV/restaurant.git&quot;,
+    &quot;accountId&quot;: &quot;df3f677a-4cd0-47dd-b9d8-4b3a543729d0&quot;
+  }
+}</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/alembic/versions/de35bbdb0c59_create_user_table.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/app/models.py" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
@@ -52,11 +81,16 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/django/payments" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-PY-243.22562.220" />
-        <option value="bundled-python-sdk-0fc6c617c4bd-9a18a617cbe4-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-243.22562.220" />
+        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-PY-243.22562.180" />
+        <option value="bundled-python-sdk-85c76a3b01b3-9a18a617cbe4-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-243.22562.180" />
       </set>
     </attachedChunks>
   </component>
@@ -93,6 +127,30 @@
       <workItem from="1734850610503" duration="3978000" />
       <workItem from="1734931068992" duration="673000" />
       <workItem from="1734932074256" duration="2880000" />
+      <workItem from="1737262618488" duration="10303000" />
+      <workItem from="1737289867739" duration="1750000" />
+      <workItem from="1737431000927" duration="4654000" />
+      <workItem from="1737521847249" duration="9871000" />
+      <workItem from="1737605075661" duration="621000" />
+      <workItem from="1737627551185" duration="3835000" />
+      <workItem from="1737692932414" duration="1950000" />
+      <workItem from="1737713934460" duration="12620000" />
+      <workItem from="1737783037117" duration="11581000" />
+      <workItem from="1737864981622" duration="3266000" />
+      <workItem from="1738485939633" duration="4668000" />
+      <workItem from="1738555624927" duration="18449000" />
+      <workItem from="1738583299665" duration="9547000" />
+      <workItem from="1738603331644" duration="355000" />
+      <workItem from="1738641931268" duration="5339000" />
+      <workItem from="1738655454728" duration="14162000" />
+      <workItem from="1738758848928" duration="617000" />
+      <workItem from="1738773432447" duration="27000" />
+      <workItem from="1738774825984" duration="1940000" />
+      <workItem from="1738810377108" duration="921000" />
+      <workItem from="1738816869264" duration="7526000" />
+      <workItem from="1738839130204" duration="602000" />
+      <workItem from="1738929348237" duration="1169000" />
+      <workItem from="1738989601717" duration="9321000" />
     </task>
     <servers />
   </component>
