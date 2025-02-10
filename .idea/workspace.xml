@@ -5,25 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ecee8036-8566-40d8-b07e-84f68cba5a98" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/routers/floor.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routers/module.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/django_payments/payments/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/restaurant.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/restaurant.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/permission.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/permission.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routers/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routers/developer.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/developer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routers/menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/menu.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routers/orders.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/orders.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routers/payme.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/payme.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routers/reservation.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/reservation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routers/statistics.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/statistics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routers/table.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/table.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/payme.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -49,7 +34,7 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/setdarovDEV/restaurant.git&quot;,
+    &quot;url&quot;: &quot;https://RNbSYbCWhzs1dFlSAzbux47nmDbbGEXG1XlohFSs8e8@github.com/setdarovDEV/restaurant.git&quot;,
     &quot;accountId&quot;: &quot;df3f677a-4cd0-47dd-b9d8-4b3a543729d0&quot;
   }
 }</component>
@@ -71,7 +56,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/msi/BMGSOFT/restaurant&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/abbos/BMGSOFT/restaurants&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -150,7 +135,14 @@
       <workItem from="1738816869264" duration="7526000" />
       <workItem from="1738839130204" duration="602000" />
       <workItem from="1738929348237" duration="1169000" />
-      <workItem from="1738989601717" duration="9321000" />
+      <workItem from="1738989601717" duration="10248000" />
+      <workItem from="1739021794657" duration="914000" />
+      <workItem from="1739024856596" duration="2752000" />
+      <workItem from="1739074524446" duration="638000" />
+      <workItem from="1739083454839" duration="593000" />
+      <workItem from="1739119500899" duration="527000" />
+      <workItem from="1739156955854" duration="34000" />
+      <workItem from="1739163388950" duration="17102000" />
     </task>
     <servers />
   </component>

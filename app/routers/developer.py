@@ -111,7 +111,7 @@ async def create_user_for_business(
     return {
         "message": "User created and linked to the business successfully",
         "business": business,
-        "user": new_user
+        "user_id": new_user
     }
 
 

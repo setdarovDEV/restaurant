@@ -11,13 +11,11 @@ import time
 payme_router = APIRouter()
 logger = logging.getLogger("payme")
 
-print(f"Loaded PAYME_MERCHANT_ID: {PaymeConfig.MERCHANT_ID}")
-print(f"Loaded PAYME_SECRET_KEY: {PaymeConfig.SECRET_KEY}")
 
 class PaymeHelper:
     endpoint = "https://checkout.paycom.uz/api"
 
-    def __init__(self, data):
+    def init(self, data):
         self.data = data
         self.transaction_id = data.get("id", None)
         self.timestamp = int(time.time())
@@ -51,7 +49,7 @@ async def payme_webhook(request: Request, db: Session = Depends(get_db)):
     params = await request.json()
     logger.info(f"Kelgan so‘rov: {params}")
 
-    auth_header = request.headers.get("Authorization")  # 🚀 `Authorization` headerni olamiz
+    auth_header = request.headers.get("Authorization")  # 🚀 Authorization headerni olamiz
     logger.info(f"Received Authorization header: {auth_header}")
 
     # 🔹 Basic Auth tekshirish
@@ -81,21 +79,10 @@ async def payme_webhook(request: Request, db: Session = Depends(get_db)):
             "error": {"code": -32504, "message": "Invalid Basic Auth format"}
         }
 
-    auth_decoded = base64.b64decode(auth_header.split(" ")[1]).decode()
-    logger.info(f"Decoded Auth Header: {auth_decoded}")
-
-    if ":" not in auth_decoded:
-        raise ValueError("Invalid Basic Auth format")
-
-    username, password = auth_decoded.split(":", 1)
-
     logger.info(f"Received MERCHANT_ID: {username}, Expected: {PaymeConfig.MERCHANT_ID}")
     logger.info(f"Received SECRET_KEY: {password}, Expected: {PaymeConfig.SECRET_KEY}")
 
-    merchant_id = PaymeConfig().MERCHANT_ID  # `.()` bilan obyekt yaratib chaqiramiz
-    secret_key = PaymeConfig().SECRET_KEY
-
-    if username != merchant_id or password != secret_key:
+    if username != PaymeConfig.MERCHANT_ID or password != PaymeConfig.SECRET_KEY:
         logger.error("Invalid credentials used")
         return {
             "jsonrpc": "2.0",
@@ -109,7 +96,7 @@ async def payme_webhook(request: Request, db: Session = Depends(get_db)):
 async def check_perform_transaction(params: dict, db: Session):
     """ Payme CheckPerformTransaction """
 
-    amount = float(params["params"].get("amount", 0))
+    amount = params["params"].get("amount")
     account = params["params"].get("account", {})
 
     # 🔹 1. Buyurtmani bazadan olish
@@ -124,7 +111,7 @@ async def check_perform_transaction(params: dict, db: Session):
             }
         }
 
-    # 🔹 2. Faqat `PENDING` statusdagi buyurtmalarni qabul qilish
+    # 🔹 2. Faqat PENDING statusdagi buyurtmalarni qabul qilish
     if order.status != "PENDING":
         return {
             "error": {
@@ -133,8 +120,8 @@ async def check_perform_transaction(params: dict, db: Session):
             }
         }
 
-    # 🔹 3. To‘lov summasi to‘g‘ri ekanligini tekshiramiz
-    expected_amount = float(order.price)
+# 🔹 3. To‘lov summasi to‘g‘ri ekanligini tekshiramiz
+    expected_amount = order.price
 
     if amount != expected_amount:
         return {
